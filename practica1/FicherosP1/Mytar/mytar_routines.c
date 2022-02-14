@@ -69,19 +69,19 @@ loadstr(FILE * file) {
  */
 stHeaderEntry*
 readHeader(FILE * tarFile, int *nFiles) {
-    int  c = getc(tarFile) + sizeof(char), i = 0, fSpace;
+    int i = 0, fSize;
     char * fileName, buffer;
-    while ()
-    while (i < nFiles && loadstr != NULL) {
-        fileName = loadstr(tarFile); //returns file name
-        fSpace = getc(tarFile); //returns file size
+    stHeaderEntry * array = NULL;
+
+    fread(nFiles, sizeof(int), 1, tarFile);
+    array = malloc(sizeof(stHeaderEntry) * (*nFiles));
+    while (i < (*nFiles) && loadstr != NULL) {
+        array[i].name = loadstr(tarFile);
+        fread(&fSize, sizeof(int), 1, tarFile);
+        array[i].size = fSize;
         i++;
-        buffer = malloc(fileName + fSpace); //hay que hacer que vaya aumentando la memoria a medida que itera
-        fread(buffer, sizeof(char), ) //hay que hacer que guarde los datos en el espacio reservado y los acumule
     }
-    fseek(file, -size, SEEK_CUR);
-    fread(buffer, sizeof(char), size, file);
-	return NULL;
+	return array;
 }
 
 /** Creates a tarball archive 
@@ -106,10 +106,13 @@ readHeader(FILE * tarFile, int *nFiles) {
  *
  */
 int
-createTar(int nFiles, char *fileNames[], char tarName[])
-{
-	// Complete the function
-	return EXIT_FAILURE;
+createTar(int nFiles, char *fileNames[], char tarName[]) {
+    int offdata = 0; //offdata lo que va a ocupar en el fichero
+    offData = sizeof(int) + nFiles * sizeof(unsigned int);
+    for (int i = 0; i < nFiles, i++) 
+        offData += strlen(fileNames[i]) + 1;
+    fopen(fileName, "w");
+    return EXIT_FAILURE;
 }
 
 /** Extract files stored in a tarball archive
@@ -129,6 +132,8 @@ createTar(int nFiles, char *fileNames[], char tarName[])
 int
 extractTar(char tarName[])
 {
-	// Complete the function
+    //al final hay que librar la memoria. 
+    //se libera iterando el array y borrando los espacios de array que teniamos reservado para los nombres con malloc
+    //despues de iterar, borramos el array
 	return EXIT_FAILURE;
 }
