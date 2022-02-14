@@ -200,3 +200,4 @@ extractTar(char tarName[]) {
     //despues de iterar, borramos el array
 	return EXIT_SUCCESS;
 }
+
