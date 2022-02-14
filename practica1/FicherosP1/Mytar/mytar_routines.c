@@ -107,12 +107,51 @@ readHeader(FILE * tarFile, int *nFiles) {
  */
 int
 createTar(int nFiles, char *fileNames[], char tarName[]) {
-    int offdata = 0; //offdata lo que va a ocupar en el fichero
+    int offdata = 0, bytesCopied; //offdata lo que va a ocupar en el fichero
+    stHeaderEntry * buffer;
+    FILE *inputFile;
+
+    FILE *outputFile = fopen(tarName, "w");
+    if(outputFile == NULL) {
+        printf("Error opening the output file");
+        return EXIT_FAILURE;
+    }
+
+    buffer = malloc(sizeof(stHeaderEntry) * nFiles);
     offData = sizeof(int) + nFiles * sizeof(unsigned int);
-    for (int i = 0; i < nFiles, i++) 
+    for (int i = 0; i < nFiles, i++) {
         offData += strlen(fileNames[i]) + 1;
-    fopen(fileName, "w");
-    return EXIT_FAILURE;
+        buffer[i].name = malloc(strlen(fileNames[i]) + 1);
+        strcpy(buffer[i].name,fileNames[i]);
+    }
+    fseek(outputFile, offData, SEEK_SET);
+    for (int i = 0; i < nFiles; i++) {
+       inputFile = fopen(fileNames[i], "r");
+
+       if(inputFile == NULL) {
+            printf("Error opening the input file");
+            return EXIT_FAILURE;
+        }
+
+       bytesCopied = copynFile(inputFile, outputFile, INT_MAX);
+       fclose(inputFile);
+       buffer[i].size = bytesCopied;
+    }
+    fseek(outputFile, 0, SEEK_SET);
+    fwrite(&nFiles, sizeof(int), 1, outputFile);
+
+    for(int i = 0; i < nFiles; i++) {
+        fwrite(buffer[i].name, strlen(buffer[i].name) + 1, 1, outputFile);
+        fwrite(&buffer[i].size, sizeof(unsigned int), 1, outputFile);
+    }
+
+    for(int i = 0; i < nFiles; i++)
+        free(buffer[i].name);
+    free(buffer);
+
+    fclose(outputFile);
+
+    return EXIT_SUCCESS;
 }
 
 /** Extract files stored in a tarball archive
@@ -130,10 +169,34 @@ createTar(int nFiles, char *fileNames[], char tarName[]) {
  *
  */
 int
-extractTar(char tarName[])
-{
-    //al final hay que librar la memoria. 
+extractTar(char tarName[]) {
+    FILE * extractedTar = fopen(tarName, "r");
+    int nFiles;
+    stHeaderEntry * tarHeader = readHeader(extractedTar, &nFiles);
+    FILE * new;
+
+    if (extractedTar == NULL) {
+        printf("Error opening .tar file");
+        return EXIT_FAILURE;
+    }
+
+    for (int i = 0; i < nFiles; i++) {
+        new = fopen(tarHeader[i].name, "w");
+
+        if (new == NULL) {
+            printf("Error opening tar header");
+            return EXIT_FAILURE;
+        }
+        copynFile(extractedTar, new, tarHeader[i].size); //asignar a entero
+        fclose(new);
+    }
+
+    for (int i = 0; i < nFiles; i++) 
+        free(tarHeader[i].name);
+
+    free(tarHeader);
+    close(extractedTar);
     //se libera iterando el array y borrando los espacios de array que teniamos reservado para los nombres con malloc
     //despues de iterar, borramos el array
-	return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
