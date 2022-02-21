@@ -475,14 +475,15 @@ static int my_truncate(const char *path, off_t size)
 }
 
 static int my_unlink(const char *path) {
-    int idxNode, idxFile;
+    int idxNode, idxFile, idxDir, nodeIdx;
+    
     //char modebuf[10];
+    //mode_string(mode, modebuf); //no le damos ningún permiso a ningún archivo porque no estamos creando ninguno
 
-    mode_string(mode, modebuf);
     fprintf(stderr, "--->>>my_unlink: path %s", path);
 
     // The directory exists
-    if(idxDir = findFileByName(&myFileSystem, (char *)path + 1) != -1)
+    if((idxDir = findFileByName(&myFileSystem, (char *)path + 1)) != -1)
         return -EEXIST;
     
     idxNode = myFileSystem.directory.files[idxFile].nodeIdx;
