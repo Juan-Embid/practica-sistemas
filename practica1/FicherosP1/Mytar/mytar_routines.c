@@ -44,11 +44,9 @@ int copynFile(FILE *origin, FILE *destination, int nBytes) //FILE --> puntero a 
  */
 char*
 loadstr(FILE * file) {
-	int ret, size = 0, c = getc(file);
+	int size = 0, c = getc(file);
 	char * buffer;
-	while (c != "\0" && c != EOF) {
-		if (c == NULL) 
-			return NULL;
+	while (c != EOF) {
 		c = getc(file);
 		size++;
 	}
@@ -70,12 +68,11 @@ loadstr(FILE * file) {
 stHeaderEntry*
 readHeader(FILE * tarFile, int *nFiles) {
     int i = 0, fSize;
-    char * fileName, buffer;
     stHeaderEntry * array = NULL;
 
     fread(nFiles, sizeof(int), 1, tarFile);
     array = malloc(sizeof(stHeaderEntry) * (*nFiles));
-    while (i < (*nFiles) && loadstr != NULL) {
+    while (i < (*nFiles)) {
         array[i].name = loadstr(tarFile);
         fread(&fSize, sizeof(int), 1, tarFile);
         array[i].size = fSize;
@@ -107,7 +104,7 @@ readHeader(FILE * tarFile, int *nFiles) {
  */
 int
 createTar(int nFiles, char *fileNames[], char tarName[]) {
-    int offdata = 0, bytesCopied; //offdata lo que va a ocupar en el fichero
+    int offData = 0, bytesCopied; //offdata lo que va a ocupar en el fichero
     stHeaderEntry * buffer;
     FILE *inputFile;
 
@@ -119,8 +116,8 @@ createTar(int nFiles, char *fileNames[], char tarName[]) {
 
     buffer = malloc(sizeof(stHeaderEntry) * nFiles);
     offData = sizeof(int) + nFiles * sizeof(unsigned int);
-    for (int i = 0; i < nFiles, i++) {
-        offData += strlen(fileNames[i]) + 1;
+    for (int i = 0; i < nFiles; i++) {
+        offData += strlen(fileNames[i]) + i;
         buffer[i].name = malloc(strlen(fileNames[i]) + 1);
         strcpy(buffer[i].name,fileNames[i]);
     }
@@ -151,6 +148,7 @@ createTar(int nFiles, char *fileNames[], char tarName[]) {
 
     fclose(outputFile);
 
+    printf("Mtar file created succesfully \n");
     return EXIT_SUCCESS;
 }
 
@@ -184,7 +182,7 @@ extractTar(char tarName[]) {
         new = fopen(tarHeader[i].name, "w");
 
         if (new == NULL) {
-            printf("Error opening tar header");
+            printf("Error creating file %s", tarHeader[i].name);
             return EXIT_FAILURE;
         }
         copynFile(extractedTar, new, tarHeader[i].size); //asignar a entero
@@ -195,7 +193,7 @@ extractTar(char tarName[]) {
         free(tarHeader[i].name);
 
     free(tarHeader);
-    close(extractedTar);
+    fclose(extractedTar);
     //se libera iterando el array y borrando los espacios de array que teniamos reservado para los nombres con malloc
     //despues de iterar, borramos el array
 	return EXIT_SUCCESS;

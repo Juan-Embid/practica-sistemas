@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -g
 
-PROG = badsort-ptr
-OBJECTS = $(PROG).o
+OBJECTS = copy.o
+PROG = copy
 
 all : $(PROG) 
 
@@ -10,7 +10,7 @@ $(PROG) : $(OBJECTS)
 	gcc -g -o $(PROG) $(OBJECTS)
 	
 %.o : %.c 
-	gcc -c $(CFLAGS) $< -o $@
+	gcc -c $(CFLAGS) $<
 
 clean :
-	-rm -f $(OBJECTS) $(PROG) 
+	-rm $(OBJECTS) $(PROG) 
