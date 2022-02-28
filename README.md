@@ -5,7 +5,7 @@ Repositorio para la practica de la asignatura sistemas operativos
 Acabada pero no correcta del todo. Estamos esperando la corrección del profesor para que nos confirme
 
 ## Practica 2: 
-
+En esta práctica hemos creado la función my_unlink y my_read. Se encuentran en el archivo fuseLib.c y ejecutan la lógica cuando se elimina y se lee un archivo.
 Once you have practica2 directory cloned in your computer, go to the PATH FicherosP2/FUSE_myFS
 
 ```bash
