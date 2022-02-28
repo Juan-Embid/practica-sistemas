@@ -477,14 +477,11 @@ static int my_truncate(const char *path, off_t size)
 static int my_unlink(const char *path) {
     int idxNode, idxDir;
     
-    //char modebuf[10];
-    //mode_string(mode, modebuf); //no le damos ningún permiso a ningún archivo porque no estamos creando ninguno
-
     fprintf(stderr, "--->>>my_unlink: path %s", path);
 
-    // The directory exists
+    //The directory doesn't exists
     if((idxDir = findFileByName(&myFileSystem, (char *)path + 1)) == -1)
-        return -EEXIST;
+        return -ENOENT;
     
     idxNode = myFileSystem.directory.files[idxDir].nodeIdx;
     resizeNode(idxNode, 0);
@@ -503,15 +500,58 @@ static int my_unlink(const char *path) {
     return 0;
 }
 
+static int my_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *f)
+{
+    char buffer[BLOCK_SIZE_BYTES];
+    int bytes2Read, totalRead = 0;
+    NodeStruct *node = myFileSystem.nodes[f->fh];
+
+    fprintf(stderr, "--->>>my_read: path %s, size %zu, offset %jd, fh %"PRIu64"\n", path, size, (intmax_t)offset, f->fh);
+
+    //Comprobamos que hay algo que leer
+    if(offset > node -> fileSize)
+        return -1;
+
+    //Guardamos el mínimo entre size y fileSize - offset
+    bytes2Read = node->fileSize - offset > size ? size : node->fileSize - offset;
+    
+    //iterador de bloques e iterador de bytes
+    // Read data
+    while(totalRead < bytes2Read) {
+        int i;
+        int currentBlock, offBlock, totalReadBlock = 0;
+        currentBlock = node->blocks[offset / BLOCK_SIZE_BYTES];
+        offBlock = offset % BLOCK_SIZE_BYTES;
+
+        if(readBlock(&myFileSystem, currentBlock, &buffer) == -1 ) {
+            fprintf(stderr,"Error reading blocks in my_read\n");
+            return -EIO;
+        }
+
+        for(i = offBlock; (i < BLOCK_SIZE_BYTES) && (totalRead < size); i++) {
+            buffer[i] = buf[totalRead++];
+            totalReadBlock++;
+        }
+
+        //Aumenta el offset en lo que llevamos leido en el bloque
+        offset += totalReadBlock;
+    }
+
+    sync();
+
+    return totalRead;
+}
+
 
 struct fuse_operations myFS_operations = {
     .getattr	= my_getattr,					// Obtain attributes from a file
     .readdir	= my_readdir,					// Read directory entries
     .truncate	= my_truncate,					// Modify the size of a file
-    .open		= my_open,						// Oeen a file
+    .open		= my_open,						// Open a file
     .write		= my_write,						// Write data into a file already opened
     .release	= my_release,					// Close an opened file
     .mknod		= my_mknod,						// Create a new file
     .unlink     = my_unlink,                    // Deletes a file
+    .read       = my_read,                       // Reads data into a file
 };
 
