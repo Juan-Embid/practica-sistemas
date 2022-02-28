@@ -1,5 +1,5 @@
 # practica-sistemas
-Repositorio para la practica de la asignatura sistemas operativos
+Repositorio para la practica de la asignatura sistemas operativos. Funciones implementadas en mytar_routines.c
 
 ## Practica 1:
 Acabada pero no correcta del todo. Estamos esperando la corrección del profesor para que nos confirme
