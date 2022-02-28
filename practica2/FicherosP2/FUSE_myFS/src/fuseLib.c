@@ -475,7 +475,7 @@ static int my_truncate(const char *path, off_t size)
 }
 
 static int my_unlink(const char *path) {
-    int idxNode, idxFile, idxDir, nodeIdx;
+    int idxNode, idxDir;
     
     //char modebuf[10];
     //mode_string(mode, modebuf); //no le damos ningún permiso a ningún archivo porque no estamos creando ninguno
@@ -483,10 +483,10 @@ static int my_unlink(const char *path) {
     fprintf(stderr, "--->>>my_unlink: path %s", path);
 
     // The directory exists
-    if((idxDir = findFileByName(&myFileSystem, (char *)path + 1)) != -1)
+    if((idxDir = findFileByName(&myFileSystem, (char *)path + 1)) == -1)
         return -EEXIST;
     
-    idxNode = myFileSystem.directory.files[idxFile].nodeIdx;
+    idxNode = myFileSystem.directory.files[idxDir].nodeIdx;
     resizeNode(idxNode, 0);
 
     // Update root folder
@@ -496,8 +496,8 @@ static int my_unlink(const char *path) {
     myFileSystem.numFreeNodes++;
 
     updateDirectory(&myFileSystem);
-    updateNode(&myFileSystem, nodeIdx, myFileSystem.nodes[nodeIdx]);
-    free(myFileSystem.nodes[nodeIdx]);
+    updateNode(&myFileSystem, idxNode, myFileSystem.nodes[idxNode]);
+    free(myFileSystem.nodes[idxNode]);
     sync();
 
     return 0;
