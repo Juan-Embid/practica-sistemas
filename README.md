@@ -13,9 +13,10 @@ cd FicherosP2/FUSE_myFS
 ```
 Changes are made in fuseLib.c
 
-To compile save the file and type the following command
+To compile save the file and type the following command and remove "virtual-disk" in case you have it
 
 ```bash
+rm virtual-disk
 make
 ```
 
