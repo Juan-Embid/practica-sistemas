@@ -42,12 +42,29 @@ MANTAIN THIS TERMINAL OPEN
 
 OPEN A NEW TERMINAL
 
-To check if your functions are correctly made
+To check if your functions are correctly made we need to create a new file
 
 ```bash
 cd mount-point
 touch test
 ls -l
+```
+
+Fill the file with information by opening it with a text editor
+
+```bash
+nano test
+```
+
+Verify the my_read function with the command "cat"
+
+```bash
+cat test
+```
+
+Now try the my_unlink function with the command "rm"
+
+```bash
 rm test
 cd ..
 ```
