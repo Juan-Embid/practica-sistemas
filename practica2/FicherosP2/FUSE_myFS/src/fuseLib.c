@@ -509,8 +509,8 @@ static int my_read(const char *path, char *buf, size_t size, off_t offset, struc
     fprintf(stderr, "--->>>my_read: path %s, size %zu, offset %jd, fh %"PRIu64"\n", path, size, (intmax_t)offset, f->fh);
 
     //Comprobamos que hay algo que leer
-    if(offset > node -> fileSize)
-        return -1;
+    if(offset >= node -> fileSize) //El offset empieza en 0
+        return 0;
 
     //Guardamos el mínimo entre size y fileSize - offset
     bytes2Read = node->fileSize - offset > size ? size : node->fileSize - offset;
@@ -528,8 +528,8 @@ static int my_read(const char *path, char *buf, size_t size, off_t offset, struc
             return -EIO;
         }
 
-        for(i = offBlock; (i < BLOCK_SIZE_BYTES) && (totalRead < size); i++) {
-            buffer[i] = buf[totalRead++];
+        for(i = offBlock; (i < BLOCK_SIZE_BYTES) && (totalRead < bytes2Read); i++) {
+            buf[totalRead++] = buffer[i];
             totalReadBlock++;
         }
 

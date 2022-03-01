@@ -20,7 +20,7 @@ rm virtual-disk
 make
 ```
 
-If there is no "mount-point" diretory, create it
+If there is no "mount-point" directory, create it
 
 ```bash
 mkdir mount-point
