@@ -18,6 +18,7 @@ int esperando_parada[N_PARADAS]; //= {0,0,...0};
 // personas que desean bajar en cada parada
 int esperando_bajar[N_PARADAS]; //= {0,0,...0};
 // Otras definiciones globales (comunicacion y sincronizacion)
+int id_actual = 1;
 
 pthread_mutex_t mutex;
 pthread_cond_t cond_bajar, cond_subir, cond_arrancar; // variables condicionables
@@ -62,14 +63,14 @@ void Subir_Autobus(int id_usuario, int origen){
     proporcionar informacion de depuracion */
     pthread_mutex_lock(&mutex); // bloqueamos el mutex
 
-    printf("Usuario %d esperando a parada %d \n", id_usuario, origen);
+    printf("Usuario %d esperando a subirse en parada %d \n", id_usuario, origen);
     esperando_parada[origen]++; // una persona más que quiere subir a la parada
     while (estado != EN_PARADA || parada_actual != origen)
         pthread_cond_wait(&cond_subir, &mutex); // va a estar esperando hasta que llegue el bus
 
     n_ocupantes++;
     esperando_parada[origen]--;
-    printf("Usuario %d esperando a parada %d \n", id_usuario, origen);
+    printf("Usuario %d se ha subido en la parada %d \n", id_usuario, origen);
 
     if(esperando_parada[origen] == 0)
         pthread_cond_signal(&cond_arrancar); // si no hay nadie esperando parada (ya han subido todos) entonces arranca
@@ -82,14 +83,14 @@ void Bajar_Autobus(int id_usuario, int destino){
     proporcionar informacion de depuracion */
     pthread_mutex_lock(&mutex); // bloqueamos el mutex
 
-    printf("Usuario %d esperando a parada %d \n", id_usuario, destino);
+    printf("Usuario %d esperando a bajarse en la parada %d \n", id_usuario, destino);
     esperando_bajar[destino]++; // una persona más que quiere bajar del autobús
     while (estado != EN_PARADA || parada_actual != destino)
         pthread_cond_wait(&cond_bajar, &mutex); // va a estar esperando hasta que llegue el bus al destino
 
     n_ocupantes--;
     esperando_parada[destino]--;
-    printf("Usuario %d esperando a parada %d \n", id_usuario, destino);
+    printf("Usuario %d se acaba de bajar en la parada %d \n", id_usuario, destino);
 
     if(esperando_parada[destino] == 0)
         pthread_cond_signal(&cond_arrancar); // si nadie más se quiere bajar entonces arranca
@@ -114,8 +115,9 @@ void Usuario(int id_usuario, int origen, int destino) {
     Bajar_Autobus(id_usuario, destino);
 }
 void * thread_usuario(void * arg) {
-    int id_usuario, a, b;
-    printf("Creando usuario \n"); //atoi en caso de que usemos arg (?)
+    int id_usuario = id_actual, a, b;
+    id_actual++;
+    printf("Creando usuario %d \n", id_usuario); //atoi en caso de que usemos arg (?)
     // obtener el id del usario
     while (1) {
         a = rand() % N_PARADAS; // parada origen
