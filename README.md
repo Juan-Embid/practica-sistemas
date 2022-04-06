@@ -76,4 +76,4 @@ And execute the disk auditor
 ```
 
 ## Practica 3: 
-Sin empezar
+Para ejecutarlo lo único que hay que hacer el un make y ejecutar el archivo
