@@ -46,7 +46,7 @@ char*
 loadstr(FILE * file) {
 	int size = 0, c = getc(file);
 	char * buffer;
-	while (c != EOF) {
+	while (c != (int)'\0' && c != EOF) {
 		c = getc(file);
 		size++;
 	}
