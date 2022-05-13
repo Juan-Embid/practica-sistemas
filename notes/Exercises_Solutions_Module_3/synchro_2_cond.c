@@ -80,9 +80,9 @@ int main()
 
     pthread_t th_odd, th_even, th_consumer;
 
-    pthread_create(&th_odd, NULL, (void *)producer_odd, NULL);
-    pthread_create(&th_even, NULL, (void *)producer_even, NULL);
-    pthread_create(&th_consumer, NULL, (void *)consumer, NULL);
+    pthread_create(&th_odd, NULL, producer_odd, NULL);
+    pthread_create(&th_even, NULL, producer_even, NULL);
+    pthread_create(&th_consumer, NULL, consumer, NULL);
 
     pthread_join(th_odd, NULL);
     pthread_join(th_even, NULL);

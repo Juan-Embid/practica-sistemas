@@ -199,3 +199,19 @@ extractTar(char tarName[]) {
 	return EXIT_SUCCESS;
 }
 
+int
+listTar(char tarName[]) {
+    FILE * extractedTar = fopen(tarName, "r");
+    int nFiles;
+    stHeaderEntry * tarHeader = readHeader(extractedTar, &nFiles);
+
+      if (extractedTar == NULL) {
+        printf("Error opening .tar file");
+        return EXIT_FAILURE;
+    }
+
+    for (int i = 0; i < nFiles; i++)
+        printf("%s \n",tarHeader[i].name);
+
+    return EXIT_SUCCESS;
+}

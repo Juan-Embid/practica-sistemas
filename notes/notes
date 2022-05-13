@@ -1,0 +1,66 @@
+Productor-Consumidor con Semáforos {
+	
+	En el main siempre vamos a tener que declarar los threads
+
+		pthread_t t_odd, th_even, th_consumer;
+
+	Inicializaremos los semáforos (el tercer argumento es el valor inicial)
+
+		sem_init(&sem_even, 0, 0);
+	    sem_init(&sem_odd, 0, 1);
+	    sem_init(&sem_cons, 0, 0);
+
+	Creamos los hilos
+
+	    pthread_create(&th_odd, NULL, (void*)producer_odd, NULL);
+	    pthread_create(&th_odd, NULL, (void*)producer_even, NULL);
+	    pthread_create(&th_odd, NULL, (void*)consumer, NULL);
+
+	Hacemos que unos esperen a que acaben los otros
+
+	    pthread_join(th_even, NULL);
+	    pthread_join(th_odd, NULL);
+	    pthread_join(th_consumer, NULL);
+
+	Y los destruimos
+
+		sem_destroy(&sem_even);
+	    sem_destroy(&sem_odd);
+	    sem_destroy(&sem_cons);
+}
+
+
+PARA PODER COMPILAR CUALQUIER EJERCICIO EN EL QUE TENGAMOS PTHREADS,
+Hay que linkear la biblioteca de threads:
+	g++ -o synchro_2_sem synchro_2_sem.c -lpthread
+
+Producto-Consumidor con MUTEX {
+
+	Se inicializan globalmente:
+
+		pthread_mutex_t mutex        = PTHREAD_MUTEX_INITIALIZER;
+		pthread_cond_t cond_var_odd  = PTHREAD_COND_INITIALIZER; // variables condicionales
+		pthread_cond_t cond_var_even = PTHREAD_COND_INITIALIZER;
+		pthread_cond_t cond_var_cons = PTHREAD_COND_INITIALIZER;
+
+	En el main:
+
+		pthread_t th_odd, th_even, th_consumer;
+
+	    pthread_create(&th_odd, NULL, producer_odd, NULL);
+	    pthread_create(&th_even, NULL, producer_even, NULL);
+	    pthread_create(&th_consumer, NULL, consumer, NULL);
+
+	    pthread_join(th_odd, NULL);
+	    pthread_join(th_even, NULL);
+	    pthread_join(th_consumer, NULL);
+
+	    pthread_mutex_destroy(&mutex);
+	    pthread_cond_destroy(&cond_var_odd);
+	    pthread_cond_destroy(&cond_var_even);
+	    pthread_cond_destroy(&cond_var_cons);
+
+	En las funciones:
+
+		Mirar ejemplos con distintas secciones críticas.
+}

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
   //Parse command-line options
-  while((opt = getopt(argc, argv, "cxf:")) != -1) {
+  while((opt = getopt(argc, argv, "cxlf:")) != -1) {
     switch(opt) {
       case 'c':
         flag=(flag==NONE)?CREATE:ERROR;
@@ -26,6 +26,8 @@ int main(int argc, char *argv[]) {
       case 'x':
         flag=(flag==NONE)?EXTRACT:ERROR;
         break;
+      case 'l':
+        flag=(flag==NONE)?LIST:ERROR;
       case 'f':
         tarName = optarg;
         break;
@@ -60,6 +62,8 @@ int main(int argc, char *argv[]) {
       }
       retCode=extractTar(tarName);
       break;
+    case LIST:
+      retCode=listTar(tarName);
     default:
       retCode=EXIT_FAILURE;
   }
