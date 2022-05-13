@@ -2,7 +2,23 @@
 Repositorio para la practica de la asignatura sistemas operativos. Funciones implementadas en mytar_routines.c
 
 ## Practica 1:
-Acabada pero no correcta del todo. Estamos esperando la corrección del profesor para que nos confirme
+To test it out you just need to type:
+
+```bash
+make
+```
+
+Once typed the following instruccion will show you how to compress several files into one single ".mtar" file
+
+```bash
+./mytar -cf project1.mtar a.txt b.txt c.txt
+```
+
+The files can be simply extracted by
+
+```bash
+./mytar -xf project1.mtar
+```
 
 ## Practica 2: 
 En esta práctica hemos creado la función my_unlink y my_read. Se encuentran en el archivo fuseLib.c y ejecutan la lógica cuando se elimina y se lee un archivo.
