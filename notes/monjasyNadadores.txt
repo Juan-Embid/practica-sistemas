@@ -1,0 +1,112 @@
+const int NMONJAS = N-1;
+//Region Critica
+int contMonjasComedor = 0;//TURNO
+//Region Critica
+//Region Critica
+int contMonjasSalida = 0;
+//Region Critica
+mutex_t mutexContadorMonjas;
+mutex_t mutexContadorMonjasSalida;
+cond_t llegadaComedor;
+cond_t condSalida;
+int entrarYSentarse() {
+	int turnoMonja;
+
+	lock(mutexContadorMonjas);
+	turnoMonja = contMonjasComedor;
+	contMonjasComedor++;
+
+	//Implementacion Barrera
+	//Ha llegado ya la ultima monja?
+	while(contMonjasComedor != NMONJAS)
+		pthread_cond_wait(llegadaComedor, mutexContadorMonjas);
+
+	//unlock(mutexContadorMonjas);
+	//Ident ultimo hilo/SI soy ultimo hilo
+	if(turnoMonja == NMONJAS)
+		pthread_cond_broadcast(llegadaComedor);
+
+	unlock(mutexContadorMonjas);
+	return turnoMonja;
+}
+
+void salirComedor(int turnoSalida) {
+	lock(mutexContadorMonjasSalida);//Se podria con mismo mtx(distinta regio
+	//Deberia saber si es mi turno, sino irme a sobar hasta q lo sea
+	
+	while(contMonjasSalida != turnoSalida)
+		pthread_cond_wait(condSalida, mutexContadorMonjasSalida);
+
+	//Me toca seguro
+	contMonjasSalida++;
+	unlock(mutexContadorMonjasSalida);
+
+	pthread_cond_broadcast(condSalida);
+}
+/////////NADADORES///////////////
+
+
+const int NTOTALNADADORES = 31 - 1;
+//REGCritica1
+int contNadadoresLLegada;
+mutex_t mutexLlegadas;
+cond_t condLlegadas;
+//REGCritica1
+//REGCritica2Multiple(1 por equipo)
+int posicionesPorequipos[8] = { 0 };
+mtx_t mutxPosicionesPorequipos[8];
+
+//REGCritica2
+
+// REG3
+int psllegada = 1;
+mutrex_t mutex_llegda;
+
+// REG3
+void beginRace(idNadador) {
+	int millegada;
+	//REG1
+	lock(mutexLlegadas);
+	millegada = contNadadoresLLegada;
+	contNadadoresLLegada++;
+		while (contNadadoresLLegada != NTOTALNADADORES) {
+			pthread_cond_wait(condLlegadas, mutexLlegadas);
+	}
+	unlock(mutexLlegadas);
+	//idUltimo
+	//REG1
+	if (millegada == NTOTALNADADORES) {
+			pthread_cond_broadcast(condLlegadas);
+	}
+	//0  4.. - 0
+	//1  5.. - 1
+	//2  6.. - 2
+	//3  7.. - 3
+	int miturnoDeSalida = idNadador mod 4;
+	int miEquipo = idNadador /4;
+
+	//REG2
+	lock(mutxPosicionesPorequipos[miequipo]);
+	while (posicionesPorequipos[miequipo] != miturnoDeSalida) {
+		pthread_cond_wait(cond_id_nadador[idNadador], mutxPosicionesPorequipos[miequipo]);
+	}
+	unlock(mutxPosicionesPorequipos[miequipo]);
+	//REG2
+}
+
+void notifyArrival(idNadador) {
+	int miturnoDeSalida = idNadador mod 4;
+	int miEquipo = idNadador / 4;
+	//sinosoy ultimo nadador de mi equipo aviso sigiente
+	if (miturnoDeSalida != 3) {//pos ultima
+		pthread_con_signal(cond_id_nadador[idNadador+1]);//Aviso siguinet
+	}
+
+	//si soy ultimo notifico llegda
+	if (miturnoDeSalida == 3) {//noti llegada
+		lock(mutexllegda);
+		printf("pos %d equipo%d\n" posicionllegada, miequipo);
+		psicionllegada++;
+		unlock(mutexllegda);
+	}
+}
