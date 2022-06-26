@@ -1,0 +1,40 @@
+	Chuletario SO
+  fopen()
+  //el flag (b) delante de (r)ead (w)rite etc es para binario
+          r o rb: Abre el fichero para lectura. El fichero debe existir o tendremos un error.
+          w o wb. Abre el fichero para escribir en él. Puede o no existir. Si existe se machaca el contenido que hubiera. Si no existe se crea.
+          a o ab. Abre el fichero para añadirle datos al final. Respeta el contenido que tuviera.
+          r+, rb+ o r+b. Abre el fichero para lectura y escritura (el + es el que indica que es para lectura y escritura a la vez). El fichero debe existir y respeta el contenido, aunque si escribimos algo iremos machacando datos.
+          w+, wb+ o w+b. Abre el fichero para lectura y escritura. Crea el fichero si no existe y machaca el contenido si existe.
+          a+, ab+ o a+b. Abre el fichero para lecturay y escritura. La escritura comenzará al final del fichero, respetando el contenido.
+
+          La función fopen() nos devuelve un FILE*. Esto no es más que un puntero a una estructura que contiene información sobre el fichero recién abierto. Normalmente podemos ignorar esa información, pero debemos hacer dos cosas con ese FILE* devuelto:
+
+          Comprobar que no es NULL. Si es NULL es que ha habido algún problema y el fichero no se ha podido abrir (se ha abierto un fichero para leer que no existe, se ha abierto para escritura en un directorio en el que no tenemos permiso de escritura, etc).
+          Guardarlo, porque es el puntero que requieren las demás funciones para saber sobre qué fichero escribir o leer. Nos servirá, desde el momento que lo abrimos, para identificar el fichero con el que queremos trabajar.
+
+Para leer bytes de un fichero, sin importarnos si hay o no fines de línea, podemos usar la función fread(). Esta función tiene los siguientes parámetros
+
+    void *ptr. Un puntero a una zona de memoria donde se guardarán los datos leidos del fichero. Nosotros pasaremos un array que hayamos creado previamente. En este array nos dejará la función los datos que leamos del fichero. El puntero es de tipo void para indicar que podemos pasar un puntero a cualquier tipo de dato que queramos. Nosotros pasaremos uno de char *.
+    size_t size. El tamaño en bytes de los datos que vamos a leer. En nuestro caso, como queremos leer bytes, este valor será 1.
+    size_t nitems. Numero de datos que queremos leer. El numero de datos que queremos leer multiplicado por el tamaño en bytes de cada dato, es decir, el número total de bytes a leer, no puede exceder el tamaño del array que pasemos como primer parámetro o tendremos efectos extraños en nuestro programa. Como el array que crearemos será de 1000 char, el numero de items maximo que podemos leer de golpe son 1000 (el tamaño del char es 1).
+    FILE *stream. ¿Recuerdas lo que nos devolvía fopen()?. Pues tenemos que ponerlo aquí.
+
+La función fread() devuelve el número de elementos leidos, que debería ser igual a nitems.
+
+    Si en el fichero hay tantos o más elementos como los que hemos mandado leer con nitems, fread() los lee y devuelve nitems.
+    Si no hay tantos elementos en el fichero, devolverá el número de elementos leidos que será menor que nitems.
+    Si devuelve 0 es que no ha leido ningún elmento porque se ha llegado al final de fichero (se han terminado los datos del fichero).
+    Si devuelve -1 es que ha habido algún error.
+
+Para escribir un fichero binario, usamos la función fwrite(). Los parámetros son los mismos que fread(), pero con las siguientes salvedades
+
+    void *ptr. El puntero a la zona de memoria. Debe estar relleno con los datos que queramos escribir en el fichero.
+    size_t size y size_t nitems indican tamaño del elemento a escribir (1 en nuestro caso, ya que usamos char) y cuantos elementos queremos escribir. El número de elementos que queremos escribir son los que realmente hay en ptr, NO el tamaño del array ptr. Puede ser un array muy grande en el que sólo hemos rellenado tres elementos, así que nitems será tres.
+    Consabido FILE *stream.
+
+La función fwrite() nos devuelve el número de elementos escritos en el fichero o -1 si ha habido algún error.
+
+hay una función feof(FILE *stream) a la que pasándole el dichoso FILE* del fichero, nos devuelve 0 si hay datos para leer u otro valor si el fichero se ha terminado. Por ello, un if bastaría para saber si hemos llegado al final de fichero
+ 
+
